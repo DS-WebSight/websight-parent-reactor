@@ -10,7 +10,7 @@
 
     <groupId>pl.ds.websight</groupId>
     <artifactId>websight-package-parent</artifactId>
-    <version>4</version>
+    <version>5</version>
     <packaging>pom</packaging>
 
     <organization>
@@ -39,13 +39,18 @@
     </developers>
 
     <scm>
-        <tag>4</tag>
+        <tag>5</tag>
         <connection>scm:git:git://github.com/DS-WebSight/websight-parent-reactor.git</connection>
         <developerConnection>scm:git:ssh://github.com:DS-WebSight/websight-parent-reactor.git</developerConnection>
         <url>https://github.com/DS-WebSight/websight-parent-reactor/tree/master</url>
     </scm>
 
     <properties>
+        <sling.install.package.username>admin</sling.install.package.username>
+        <sling.install.package.password>admin</sling.install.package.password>
+        <sling.install.package.host>localhost</sling.install.package.host>
+        <sling.install.package.port>8080</sling.install.package.port>
+        <sling.install.package.path>/apps/websight-package-manager-service/bin/install</sling.install.package.path>
         <autoReleaseAfterClose>false</autoReleaseAfterClose>
     </properties>
 
@@ -237,11 +242,44 @@
                         <packageType>container</packageType>
                     </configuration>
                 </plugin>
+
+                <plugin>
+                    <groupId>com.day.jcr.vault</groupId>
+                    <artifactId>content-package-maven-plugin</artifactId>
+                    <version>1.0.4</version>
+                    <configuration>
+                        <userId>${sling.install.package.username}</userId>
+                        <password>${sling.install.package.password}</password>
+                        <failOnError>true</failOnError>
+                        <group>pl.ds.websight</group>
+                        <targetURL>http://${sling.install.package.host}:${sling.install.package.port}${sling.install.package.path}</targetURL>
+                    </configuration>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
 
     <profiles>
+        <profile>
+            <id>autoInstallPackage</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.day.jcr.vault</groupId>
+                        <artifactId>content-package-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>install-package</id>
+                                <goals>
+                                    <goal>install</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
         <profile>
             <id>centralRepository</id>
             <build>
